@@ -1,0 +1,583 @@
+
+
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+ 
+
+
+      <title>Towards a Unified Differentiable Pipeline - </title>
+
+  <meta name="description" content="An exploration of the methods required to design a differentiable end-to-end event camera learning pipeline with Pytorch">
+  <meta name="author" content="Kyle Thompson"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "Kyle Thompson",
+    
+    "url": "https:\/\/kylezthompson.com\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "https:\/\/kylezthompson.com\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "https:\/\/kylezthompson.com\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "https:\/\/kylezthompson.com\/projects\/events\/",
+          "name": "Towards a unified differentiable pipeline"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Kyle Thompson"
+  },
+  "headline": "Towards a Unified Differentiable Pipeline",
+  "description" : "An exploration of the methods required to design a differentiable end-to-end event camera learning pipeline with Pytorch",
+  "inLanguage" : "en",
+  "wordCount":  1173 ,
+  "datePublished" : "2026-03-15T17:00:26-05:00",
+  "dateModified" : "2026-03-15T17:00:26-05:00",
+  "image" : "https:\/\/kylezthompson.com\/img\/profile.png",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "https:\/\/kylezthompson.com\/projects\/events\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "https:\/\/kylezthompson.com\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "https:\/\/kylezthompson.com\/img\/profile.png",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+
+<meta property="og:title" content="Towards a Unified Differentiable Pipeline" />
+<meta property="og:description" content="An exploration of the methods required to design a differentiable end-to-end event camera learning pipeline with Pytorch">
+<meta property="og:image" content="https://kylezthompson.com/img/profile.png" />
+<meta property="og:url" content="https://kylezthompson.com/projects/events/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Kyle Thompson" />
+
+  <meta name="twitter:title" content="Towards a Unified Differentiable Pipeline" />
+  <meta name="twitter:description" content="An exploration of the methods required to design a differentiable end-to-end event camera learning pipeline with Pytorch">
+  <meta name="twitter:image" content="https://kylezthompson.com/img/profile.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link href='https://kylezthompson.com/img/favicon.ico' rel='icon' type='image/x-icon'/>
+  <meta name="generator" content="Hugo 0.152.0">
+  <link rel="alternate" href="https://kylezthompson.com/index.xml" type="application/rss+xml" title="Kyle Thompson"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" integrity="sha384-5TcZemv2l/9On385z///+d7MSYlvIEw9FuZTIdZ14vJLqWphw7e7ZPuOiCHJcFCP" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v7.0.1/css/brands.css" integrity="sha384-+eXGm6TmVoCZR1gX03US+L++L2mJIfOvp2X0+luTuEktXaF5F+e3zn0sO0HBvOyT" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v7.0.1/css/fontawesome.css" integrity="sha384-B5nyPZa7e84uCJEYHtevCdVYtQosWsbDSRtq3cy/jeSVtQW05GL8CKXO7waXsjPK" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v7.0.1/css/regular.css" integrity="sha384-V71z/A/p/DGaZAryHhiSXRQj8HdQmK2nBgL2bX23MGD+h6ZKpyxOO76f5eSXmIaj" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v7.0.1/css/solid.css" integrity="sha384-1IIShlrK5iYgvS7OAgIH3prz4RAFP7hHZ2MaLIb9l3+trFwwnw/NdCWcUHlymZDU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v7.0.1/css/svg.css" integrity="sha384-iBa7uugTOHXqQ2ngvDYJyKrPPQbd9n2P3EQe+o/0+HZe5TNvV+LO5X0lLLUrXLHP" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v7.0.1/css/svg-with-js.css" integrity="sha384-STWnS5AGz6M2YxsnGAd536EqcE2y+ktGovMMuhtXLsCBtl7lujeQj2eN4eDxa57x" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v7.0.1/css/v4-font-face.css" integrity="sha384-fH83IkgQi7kturzlxpXfNdsR8aUOcqj5HUORRVnSvJgObZkIw6aqKAaQx20IWyB/" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v7.0.1/css/v4-shims.css" integrity="sha384-cCODJHSivNBsaHei/8LC0HUD58kToSbDU+xT7Rs51BO1v/IvgT/uM0W6xMoUqKfn" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v7.0.1/css/v5-font-face.css" integrity="sha384-atSdF89mIn15dv+o2LKkDM6mCh3hwh6A7mwZ6F2it/kenqZbMu+QW/ye1OG4XSWV" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous"><link rel="stylesheet" href="https://kylezthompson.com/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" />
+  <link rel="stylesheet" href="https://kylezthompson.com/css/highlight.min.css" /><link rel="stylesheet" href="https://kylezthompson.com/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://kylezthompson.com/css/custom.css" />
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['$', '$']],
+      displayMath: [['$$', '$$']]
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="https://kylezthompson.com/">Kyle Thompson</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+        
+        <li class="navlinks-container">
+          <a class="navlinks-parent" role="button" tabindex="0">Featured Projects</a>
+          <div class="navlinks-children">
+            
+            
+              <a href="/projects/paws/">Open Vocabulary Semantic Memory for Unitree Go2</a>
+            
+              <a href="/projects/ball_catcher/">Ball Catching Franka Arm with YOLO</a>
+            
+              <a href="/projects/jack_impact/">Jack in a Cup Impact Simulation</a>
+            
+          </div>
+        </li>
+
+        
+          
+            <li>
+              <a title="About Me" href="/about/">About Me</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Resume" href="/resume.pdf">Resume</a>
+            </li>
+          
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+      <div class="avatar-container">
+        <div class="avatar-img-border">
+          <a title="Kyle Thompson" href="https://kylezthompson.com/">
+            <img class="avatar-img" src="https://kylezthompson.com/img/profile.png" alt="Kyle Thompson" />
+           
+          </a>
+        </div>
+      </div>
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="projects-heading">
+              
+                <h1>Towards a Unified Differentiable Pipeline</h1>
+              
+              
+                <hr class="small">
+              
+              
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-10 col-lg-offset-1 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        
+          <a href="https://github.com/KThompson2002/events_optics_e2e" target="_blank" rel="noopener noreferrer" class="github-link">
+            <i class="fab fa-github"></i> View on GitHub
+          </a>
+        
+        <h2 id="overview">Overview</h2>
+<p>Event cameras are neuromorphic sensors that output asynchronous per-pixel brightness <em>changes</em> rather than full frames, enabling extremely low latency and high dynamic range perception. This project builds and connects the full stack needed to jointly optimize an event camera&rsquo;s optics and event generation alongside downstream flow estimation networks. While ultimately unsuccesful, differentiability was proven along each rung of the differentiable ladder. Each section below covers a tool or experiment that moves toward that goal. The final endpoint is optimization for a specific robotics task.</p>
+<p><img src="/img/event_flowchart.png" alt="Pipeline Overview">
+<em>Figure 1: The end-to-end differentiable pipeline connecting lens geometry, event simulation, and optical flow.</em></p>
+<h3 id="custom-frame-difference-emulator">Custom Frame-Difference Emulator</h3>
+<p>As a starting point, I wrote a naive DVS emulator from scratch (<code>event.py</code>). It converts frames to grayscale, computes log-intensity <code>L = log(I + ε)</code>, and fires ON/OFF events when the change exceeds a threshold:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">ON  event: ΔL ≥  threshold
+</span></span><span class="line"><span class="cl">OFF event: ΔL ≤ −threshold
+</span></span></code></pre></div><p>Output is a CSV of <code>(t, x, y, p)</code> tuples plus a visualization video using an exponential-decay event accumulator. It has no sensor physics but it&rsquo;s fast and fully interpretable as a baseline.</p>
+<p><img src="/img/naive_emulator.gif" alt="Naive emulator output">
+<em>Figure 2: Event accumulation visualization from the custom frame-difference emulator</em></p>
+<h3 id="v2e">v2e</h3>
+<p><a href="https://github.com/SensorsINI/v2e">v2e</a> is a high-fidelity DVS simulator with full sensor physics[1] . Key features:</p>
+<ul>
+<li><strong>Frame interpolation</strong>: Upsamples video to high frame rates before event generation</li>
+<li><strong>Photoreceptor model</strong>: 1st-order IIR lowpass filter with intensity-dependent bandwidth</li>
+<li><strong>Realistic noise</strong>: per-pixel threshold variation (<code>σ_threshold</code>), leak events, shot noise, and refractory periods</li>
+<li>Outputs AEDAT/H5 formats compatible with standard event-camera toolchains</li>
+</ul>
+<p>v2e is significantly more realistic than the naive approach, but its simulation graph is not differentiable.</p>
+<p><img src="/img/v2e_emulator.gif" alt="Naive emulator output">
+<em>Figure 3: Output from v2E event emulator.</em></p>
+<h3 id="senpi-senpi_ebi">SENPI (<code>senpi_ebi</code>)</h3>
+<p>SENPI wraps the same physics as v2e in a PyTorch <code>nn.Module</code>, making the entire simulation differentiable via autograd[2]. <code>EventSimulator.forward(I)</code> returns both a sparse event tensor <code>(t, x, y, p)</code> and dense event accumulation frames (<code>eframes</code>).</p>
+<hr>
+<h2 id="2-differentiable-optics-with-deeplens">2. Differentiable Optics with DeepLens</h2>
+<p><a href="https://github.com/singer-yang/DeepLens">DeepLens</a> implements differentiable ray tracing and wave optics[3]. <code>GeoLens</code> handles refractive lenses; <code>DiffracLens</code> handles diffractive ones. Lens surface radii and thicknesses are PyTorch parameters, so gradients flow from any downstream loss all the way back to lens geometry.</p>
+<p>To verify the gradient chain, I built a minimal E2E demo:</p>
+<ul>
+<li><strong>Scene:</strong> synthetic checkerboard translated across frames to produce motion</li>
+<li><strong>Pipeline:</strong> <code>GeoLens.render()</code> → SENPI <code>EventSimulator</code> → Sobel edge-energy loss on event frames</li>
+<li><strong>Loss:</strong> maximize edge sharpness while penalizing trivial high-activity: <code>loss = −(edge − λ·activity)</code></li>
+<li><strong>Optimizer:</strong> <code>lens.get_optimizer()</code> with per-parameter learning rates for radii and thicknesses</li>
+</ul>
+<p>Gradient flow was verified to be non-zero end-to-end through optics → events → loss.</p>
+<p><img src="/img/optics_e2e.gif" alt="DeepLens optimization">
+<em>Figure 4: Lens surface parameter evolution during E2E optimization. Parameters converge toward configurations that maximize downstream edge sharpness in event frames.</em></p>
+<p><img src="/img/sobel_energy.png" alt="Sobel Energy Over Time">
+<em>Figure 5: Sobel energy change over time during E2E optimization</em></p>
+<h2 id="3-synthetic-data-generation-with-isaacsim">3. Synthetic Data Generation with IsaacSim</h2>
+<p>For training the flow network, I generated synthetic event sequences using Nvidia Omniverse/Replicator with ground-truth optical flow and 6-DOF pose.</p>
+<p><strong>Dataset:</strong> 5 diverse camera trajectories × 600 frames = 3,000 total frames</p>
+<p>Trajectory types:</p>
+<ul>
+<li>Orbital paths at variable radii and speeds</li>
+<li>Radial oscillations</li>
+<li>Vertical oscillations</li>
+<li>Segment IDs to filter sequences crossing trajectory boundaries</li>
+</ul>
+<p><img src="/img/isaacsim_dataset.gif" alt="IsaacSim dataset">
+<em>Figure 6: Sample IsaacSim frames with the camera output (left) and ground-truth optical flow overlay (right).</em></p>
+<h2 id="4-the-differentiability-problem">4. The Differentiability Problem</h2>
+<p>Event cameras produce discrete, binary outputs. Gradients cannot flow through a hard threshold. Two approaches solve this.</p>
+<h3 id="approach-1-senpi-dense-event-frames">Approach 1: SENPI Dense Event Frames</h3>
+<p>SENPI&rsquo;s <code>eframes</code> aggregate events over time windows via differentiable PyTorch ops.</p>
+<h3 id="approach-2-soft_events--sigmoid-sharpening">Approach 2: <code>soft_events()</code> — Sigmoid Sharpening</h3>
+<p>A custom differentiable approximation replacing hard thresholding with a sigmoid:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">soft_events</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">thr</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">sharpness</span><span class="o">=</span><span class="mf">50.0</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">L</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">I</span><span class="o">.</span><span class="n">clamp_min</span><span class="p">(</span><span class="n">eps</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dL</span> <span class="o">=</span> <span class="n">L</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">L</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>                          <span class="c1"># [F-1, H, W]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Epos</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">sharpness</span> <span class="o">*</span> <span class="p">(</span><span class="n">dL</span> <span class="o">-</span> <span class="n">thr</span><span class="p">))</span>  <span class="c1"># smooth ON probability</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Eneg</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">sharpness</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">dL</span> <span class="o">-</span> <span class="n">thr</span><span class="p">))</span> <span class="c1"># smooth OFF probability</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">Epos</span><span class="p">,</span> <span class="n">Eneg</span>
+</span></span></code></pre></div><p>At <code>sharpness=50</code>, the sigmoid closely approximates a step function while remaining differentiable everywhere. <code>Epos</code>, <code>Eneg</code> ∈ [0, 1] represent soft firing probabilities rather than binary events.</p>
+<p><strong>Key finding:</strong> The SENPI sparse <code>events</code> tensor does not carry gradients — event positions are discrete indices. Gradients must flow through either the dense eframes or the soft approximation.</p>
+<p><img src="/img/soft_events_plot.png" alt="Soft events sigmoid">
+<em>Figure 7: Sigmoid approximation of the event threshold at varying sharpness values. At sharpness=50 the sigmoid closely approximates a hard step while remaining differentiable.</em></p>
+<h2 id="5-flow-network-integration">5. Flow Network Integration</h2>
+<h3 id="spike-flownet">Spike-FlowNet</h3>
+<p>Spike-FlowNet is a hybrid SNN+ANN encoder-decoder for event-based optical flow, pretrained on MVSEC real outdoor sequences[4]. Input format: <code>[B, 4, H, W, T_bins]</code>.</p>
+<p>Several problems arose integrating it into this pipeline:</p>
+<ol>
+<li><strong>Gradient instability:</strong> IF neurons output binary spikes; surrogate gradients are unreliable when fine-tuning outside the original data distribution.</li>
+<li><strong>5D input format:</strong> Required building <code>soft_events_to_spike_input()</code> to reshape and bin soft events, introducing hard bin-boundary artifacts.</li>
+<li><strong>Domain mismatch:</strong> Pretrained weights trained on real DVS data did not transfer to synthetic soft events with different statistics.</li>
+<li><strong>Event sparsity:</strong> Synthetic scenes produced far fewer events than real outdoor sequences, causing many batches to be skipped (<code>MIN_EVENT_ACTIVITY = 10.0</code>).</li>
+<li><strong>Resolution mismatch:</strong> MVSEC resolution required resizing and flow rescaling for 256×256 IsaacSim data.</li>
+</ol>
+<p><img src="/img/flownet_events_training.png" alt="Spike-Flownet training">
+<em>Figure 8: Spike-FlowNet training loss and AEE validation.</em></p>
+<hr>
+<h2 id="6-camera-placement-as-a-differentiable-design-variable">6. Camera Placement as a Differentiable Design Variable</h2>
+<p>Camera placement evaluation raises an interesting question: if orientation measurably affects downstream task performance, can it be optimized rather than hand-chosen? Different mounting orientations provide fundamentally different observability over robot velocity axes. Cvent flow encodes motion projected onto the image plane, so a given mounting is informative about some velocity components and structurally blind to others. A forward-facing camera sees ego-motion clearly but loses sensitivity to lateral drift; a downward-facing camera reads ground texture flow well but is insensitive to yaw. No single fixed orientation is optimal across all axes simultaneously.</p>
+<p>Adding placement to the optimization means parameterizing the camera&rsquo;s 6-DOF pose on the robot body as a learnable variable and differentiating the rendering step with respect to that pose.</p>
+<hr>
+<h2 id="7-the-full-differentiable-chain">7. The Full Differentiable Chain</h2>
+<p><img src="/img/gradient.png" alt="Spike-Flownet Events training">
+<em>Figure 9: Spike-FlowNet training loss and qualitative comparison of predicted optical flow vs. IsaacSim ground truth.</em></p>
+<hr>
+<p>Gradient flow was verified at each junction:</p>
+<ul>
+<li><strong>Lens → Image:</strong> via DeepLens differentiable ray tracing</li>
+<li><strong>Image → Events:</strong> via <code>soft_events()</code> sigmoid approximation</li>
+<li><strong>Events → Flow:</strong> via FlowNetEvents convolutional encoder</li>
+</ul>
+<p><strong>Open question:</strong> Full end-to-end lens co-optimization with event-based flow on realistic robot trajectories — jointly updating lens geometry, camera placement, and network weights for a specific downstream robotic sensing task.</p>
+<h2 id="references">References</h2>
+<p>[1] Y. Hu, S.-C. Liu, and T. Delbruck, &ldquo;v2e: From video frames to realistic
+DVS events,&rdquo; in <em>Proc. IEEE/CVF Conference on Computer Vision and Pattern
+Recognition Workshops (CVPRW)</em>, Jun. 2021, pp. 1312–1321.
+[Online]. Available: <a href="https://arxiv.org/abs/2006.07722">https://arxiv.org/abs/2006.07722</a></p>
+<p>[2] J. L. Greene, A. Kar, I. Galindo, E. Quiles, E. Chen, and M. Anderson,
+&ldquo;A PyTorch-enabled tool for synthetic event camera data generation and
+algorithm development,&rdquo; Georgia Tech Research Institute, Mar. 2025.
+[Online]. Available: <a href="https://arxiv.org/abs/2503.09754">https://arxiv.org/abs/2503.09754</a></p>
+<p>[3] X. Yang, Q. Fu, and W. Heidrich, &ldquo;Curriculum learning for ab initio deep
+learned refractive optics,&rdquo; <em>Nature Communications</em>, Feb. 2023.
+[Online]. Available: <a href="https://arxiv.org/abs/2302.01089">https://arxiv.org/abs/2302.01089</a></p>
+<p>[4] C. Lee, A. K. Kosta, A. Z. Zhu, K. Chaney, K. Daniilidis, and K. Roy,
+&ldquo;Spike-FlowNet: Event-based optical flow estimation with energy-efficient
+hybrid neural networks,&rdquo; in <em>Proc. European Conference on Computer Vision
+(ECCV)</em>, Glasgow, UK, Aug. 2020, pp. 366–382.</p>
+
+
+        
+
+        
+            <hr/>
+            <section id="social-share">
+              <div class="list-inline footer-links">
+                
+
+<div class="share-box" aria-hidden="true">
+    <ul class="share">
+      
+      <li>
+        <a href="//twitter.com/share?url=https%3a%2f%2fkylezthompson.com%2fprojects%2fevents%2f&amp;text=Towards%20a%20Unified%20Differentiable%20Pipeline&amp;via=" target="_blank" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.facebook.com/sharer/sharer.php?u=https%3a%2f%2fkylezthompson.com%2fprojects%2fevents%2f" target="_blank" title="Share on Facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//reddit.com/submit?url=https%3a%2f%2fkylezthompson.com%2fprojects%2fevents%2f&amp;title=Towards%20a%20Unified%20Differentiable%20Pipeline" target="_blank" title="Share on Reddit">
+          <i class="fab fa-reddit"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.linkedin.com/shareArticle?url=https%3a%2f%2fkylezthompson.com%2fprojects%2fevents%2f&amp;title=Towards%20a%20Unified%20Differentiable%20Pipeline" target="_blank" title="Share on LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.stumbleupon.com/submit?url=https%3a%2f%2fkylezthompson.com%2fprojects%2fevents%2f&amp;title=Towards%20a%20Unified%20Differentiable%20Pipeline" target="_blank" title="Share on StumbleUpon">
+          <i class="fab fa-stumbleupon"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.pinterest.com/pin/create/button/?url=https%3a%2f%2fkylezthompson.com%2fprojects%2fevents%2f&amp;description=Towards%20a%20Unified%20Differentiable%20Pipeline" target="_blank" title="Share on Pinterest">
+          <i class="fab fa-pinterest"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+
+              </div>
+            </section>
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+        <ul class="pager blog-pager">
+          
+            <li class="previous">
+              <a href="https://kylezthompson.com/projects/paws/" data-toggle="tooltip" data-placement="top" title="Open Vocabulary Semantic Memory for Unitree Go2">&larr; Previous Post</a>
+            </li>
+          
+          
+        </ul>
+      
+
+
+      
+
+      
+
+      
+        
+      
+
+    </div>
+  </div>
+</div>
+
+      <footer>
+  <div class="container">
+    
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+		
+		  <a href="mailto:kylezthompson@gmail.com" title="Email me">
+		
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fas fa-envelope fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+		
+		  <a href="https://github.com/KThompson2002" title="GitHub">
+		
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+		
+		  <a href="https://linkedin.com/in/kyle-z-thompson" title="LinkedIn">
+		
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          
+          
+        </ul>
+        <p class="credits copyright text-muted">
+          
+            
+              <a href="yourwebsite.com">Kyle Thompson</a>
+            
+          
+
+          &nbsp;&bull;&nbsp;&copy;
+          
+            2026
+          
+
+          
+            &nbsp;&bull;&nbsp;
+            <a href="https://kylezthompson.com/">Kyle Thompson</a>
+          
+        </p>
+        
+        <p class="credits theme-by text-muted">
+          <a href="https://gohugo.io">Hugo v0.152.0</a> powered &nbsp;&bull;&nbsp; Theme <a href="https://github.com/halogenica/beautifulhugo">Beautiful Hugo</a> adapted from <a href="https://deanattali.com/beautiful-jekyll/">Beautiful Jekyll</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js" integrity="sha384-cMkvdD8LoxVzGF/RPUKAcvmm49FQ0oxwDF3BGKtDXcEc+T1b2N+teh/OJfpU0jr6" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha384-w5y/xIeYixWvfM+A1cEbmHPURnvyqmVg5eVENruEdDjcyRLUSNej7512JQGspFUr" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+
+<script src="https://kylezthompson.com/js/main.js"></script>
+<script src="https://kylezthompson.com/js/highlight.min.js"></script>
+<script> hljs.initHighlightingOnLoad(); </script>
+<script> $(document).ready(function() {$("pre.chroma").css("padding","0");}); </script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="https://kylezthompson.com/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+
